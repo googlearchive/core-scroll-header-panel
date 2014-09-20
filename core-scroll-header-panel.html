@@ -171,7 +171,18 @@ or class `content` to delineate the content section.
        * @type boolean
        * @default false
        */
-      scrollAwayTopbar: false
+      scrollAwayTopbar: false,
+
+      /**
+       * Reference to the scrollable element.  By default, `scroll-header-panel`
+       * provides a scrollable region where the `content` is distributed, however
+       * this property may be set to an external element, such that `scroll-header-panel`
+       * can be placed on top of an external scrollable element.
+       *
+       * @property scroller
+       * @type Object
+       */
+      scroller: null
     },
 
     prevScrollTop: 0,
@@ -186,29 +197,28 @@ or class `content` to delineate the content section.
     
     ready: function() {
       this._scrollHandler = this.scroll.bind(this);
-      this.scroller.addEventListener('scroll', this._scrollHandler);
+      this.scroller = this.$.mainContainer;
     },
     
     detached: function() {
-      this.scroller.removeEventListener('scroll', this._scrollHandler);
+      this._scroller.removeEventListener('scroll', this._scrollHandler);
     },
     
     domReady: function() {
       this.async('measureHeaderHeight');
     },
 
+    scrollerChanged: function() {
+      if (this._scroller) {
+        this._scroller.removeEventListener('scroll', this._scrollHandler, false);
+      }
+      this._scroller = this.scroller;
+      this._scroller.addEventListener('scroll', this._scrollHandler);
+      this.style.overflow = (this._scroller == this.$.mainContainer) ? 'hidden' : 'visible';
+    },
+
     get header() {
       return this.$.headerContent.getDistributedNodes()[0];
-    },
-    
-    /**
-     * Returns the scrollable element.
-     *
-     * @property scroller
-     * @type Object
-     */
-    get scroller() {
-      return this.$.mainContainer;
     },
     
     measureHeaderHeight: function() {
@@ -245,7 +255,7 @@ or class `content` to delineate the content section.
     },
     
     setup: function() {
-      var s = this.scroller.style;
+      var s = this._scroller.style;
       s.paddingTop = this.fixed ? '' : this.headerHeight + 'px';
       s.top = this.fixed ? this.headerHeight + 'px' : '';
       if (this.fixed) {
@@ -301,7 +311,7 @@ or class `content` to delineate the content section.
         return;
       }
       
-      var sTop = this.scroller.scrollTop;
+      var sTop = this._scroller.scrollTop;
       
       var y = Math.min(this.keepCondensedHeader ? 
           this.headerMargin : this.headerHeight, Math.max(0, 
@@ -319,7 +329,7 @@ or class `content` to delineate the content section.
       this.y = y;
       
       if (event) {
-        this.fire('scroll', {target: this.scroller}, this, false);
+        this.fire('scroll', {target: this._scroller}, this, false);
       }
     }
 
