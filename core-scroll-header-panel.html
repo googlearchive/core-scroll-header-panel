@@ -58,20 +58,15 @@ or class `content` to delineate the content section.
   <link rel="stylesheet" href="core-scroll-header-panel.css">
 
   <div id="mainContainer">
-  
-    <content id="mainContent" select="[content], .content"></content>
-    
-  </div>
-  
-  <div id="headerContainer">
-  
-    <div class="bg-container">
-      <div id="condensedHeaderBg"></div>
-      <div id="headerBg"></div>
+    <div id="headerContainer">
+      <div class="bg-container">
+        <div id="condensedHeaderBg"></div>
+        <div id="headerBg"></div>
+      </div>
+      <content id="headerContent" select="core-toolbar, .core-header"></content>
     </div>
-    
-    <content id="headerContent" select="core-toolbar, .core-header"></content>
-    
+
+    <content id="mainContent" select="[content], .content"></content>
   </div>
   
 </template>
@@ -254,20 +249,15 @@ or class `content` to delineate the content section.
     
     setup: function() {
       var s = this.scroller.style;
-      s.paddingTop = this.fixed ? '' : this.headerHeight + 'px';
-      s.top = this.fixed ? this.headerHeight + 'px' : '';
-      if (this.fixed) {
-        this.transformHeader(null);
-      } else {
-        this.scroll();
-      }
+      s.paddingTop = this.headerHeight + 'px';
+      this.scroll();
     },
     
     transformHeader: function(y) {
       var s = this.$.headerContainer.style;
-      this.translateY(s, -y);
+      this.translateY(s, this.scroller.scrollTop - y);
       
-      if (this.condenses) {
+      if (this.condenses && y !== this.y) {
         this.condenseHeader(y);
       }
       
@@ -318,11 +308,8 @@ or class `content` to delineate the content section.
       if (this.condenses && this.prevScrollTop >= sTop && sTop > this.headerMargin) {
         y = Math.max(y, this.headerMargin);
       }
-      
-      if (!event || !this.fixed && y !== this.y) {
-        this.transformHeader(y);
-      }
-      
+
+      this.transformHeader(this.fixed ? 0 : y);
       this.prevScrollTop = Math.max(sTop, 0);
       this.y = y;
       
