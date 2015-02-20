@@ -94,6 +94,9 @@ that represents a header by adding a `core-header` class to it.
      */
      
     publish: {
+      
+      fullWindow: {value: false, reflect: true},
+
       /**
        * If true, the header's height will condense to `_condensedHeaderHeight`
        * as the user scrolls down from the top of the content area.
@@ -184,6 +187,7 @@ that represents a header by adding a `core-header` class to it.
     y: 0,
     
     observe: {
+      'fullWindow': 'fullWindowSetup',
       'headerMargin fixed': 'setup'
     },
 
@@ -192,16 +196,16 @@ that represents a header by adding a `core-header` class to it.
     },
 
     attached: function() {
+      this.fullWindowSetup();
       this.resizableAttachedHandler();
     },
 
     ready: function() {
       this._scrollHandler = this.scroll.bind(this);
-      this.scroller.addEventListener('scroll', this._scrollHandler);
     },
     
     detached: function() {
-      this.scroller.removeEventListener('scroll', this._scrollHandler);
+      this.scrollObject.removeEventListener('scroll', this._scrollHandler);
       this.resizableDetachedHandler();
     },
     
@@ -319,7 +323,7 @@ that represents a header by adding a `core-header` class to it.
         return;
       }
       
-      var sTop = this.scroller.scrollTop;
+      var sTop = this.fullWindow ? window.pageYOffset : this.$.mainContainer.scrollTop;
       
       var y = Math.min(this.keepCondensedHeader ? 
           this.headerMargin : this.headerHeight, Math.max(0, 
@@ -337,9 +341,25 @@ that represents a header by adding a `core-header` class to it.
       this.y = y;
       
       if (event) {
-        this.fire('scroll', {target: this.scroller}, this, false);
+        this.fire('scroll', {target: this.scrollObject}, this, false);
       }
-    }
+    },
+    
+    fullWindowSetup: function() {
+      this.scrollObject && this.scrollObject.removeEventListener('scroll', this._scrollHandler);
+      this.scrollObject = this.fullWindow ? window : this.$.mainContainer;
+      this.scrollObject.addEventListener('scroll', this._scrollHandler);
+      this.style.position = this.fullWindow ? 'static' : '';
+      this.style.height = this.fullWindow ? 'auto' : '';
+      var parent = this.parentNode;
+      while (parent && parent != document.body) {
+        if (parent.drawerWidth) {
+          parent.fullWindow = this.fullWindow;
+          break;
+        }
+        parent = parent.parentNode;
+      }
+    }   
 
   }, Polymer.CoreResizable));
   

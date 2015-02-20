@@ -13,6 +13,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   overflow: hidden;
 }
 
+:host([fullWindow]) {
+  min-height: 100%;
+}
+
 #mainContainer {
   position: absolute;
   top: 0;
@@ -26,11 +30,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   overflow-y: auto;
 }
 
+:host([fullWindow]) #mainContainer {
+  position: relative;
+}
+
 #headerContainer {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
+}
+
+:host([fullWindow]) #headerContainer {
+  position: fixed;
 }
 
 .bg-container {
