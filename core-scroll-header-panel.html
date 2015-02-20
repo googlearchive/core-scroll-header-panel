@@ -220,7 +220,7 @@ that represents a header by adding a `core-header` class to it.
     },
     
     detached: function() {
-      this.drawerPanel = null;
+      this.drawerWidth = false;
       this.scrollObject.removeEventListener('scroll', this._scrollHandler);
       this.resizableDetachedHandler();
     },
@@ -368,12 +368,15 @@ that represents a header by adding a `core-header` class to it.
       if (this.fullWindow) {
         this.style.position = 'static';
         this.style.height = 'auto';
-        if (!this.drawerPanel) {
+        if (!this.drawerWidth) {
           var parent = this.parentNode;
           while (parent && parent != document.body) {
             if (parent.drawerWidth) {
               parent.setAttribute('data-fullwindow', true);
-              this.drawerPanel = parent;
+              parent.addEventListener('core-responsive-change', this.toggleNarrow.bind(this));
+              this.drawerWidth = parent.drawerWidth;
+              this.rightDrawer = parent.rightDrawer;
+              this.narrow = parent.narrow;
               break;
             }
             parent = parent.parentNode;
@@ -382,11 +385,23 @@ that represents a header by adding a `core-header` class to it.
       } else {
         this.style.position = '';
         this.style.height = '';
-        if (this.drawerPanel) {
-          this.drawerPanel.removeAttribute('data-fullwindow');
-          this.drawerPanel = null;
+        if (this.drawerWidth) {
+          var parent = this.parentNode;
+          while (parent && parent != document.body) {
+            if (parent.drawerWidth) {
+              parent.removeAttribute('data-fullwindow');
+              parent.removeEventListener('core-responsive-change', this.toggleNarrow.bind(this));
+              this.drawerWidth = false;
+              break;
+            }
+            parent = parent.parentNode;
+          }
         }
       }
+    },
+    
+    toggleNarrow: function(e) {
+      this.narrow = e.detail.narrow;
     }
 
   }, Polymer.CoreResizable));
