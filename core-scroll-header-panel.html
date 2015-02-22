@@ -52,11 +52,14 @@ that represents a header by adding a `core-header` class to it.
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-resizable/core-resizable.html">
+<link rel="import" href="../core-style/core-style.html">
 
 <polymer-element name="core-scroll-header-panel">
 <template>
 
   <link rel="stylesheet" href="core-scroll-header-panel.css">
+  
+  <core-style ref="indentHeader"></core-style>
 
   <div id="mainContainer">
   
@@ -351,14 +354,16 @@ that represents a header by adding a `core-header` class to it.
       this.scrollObject.addEventListener('scroll', this._scrollHandler);
       this.style.position = this.fullWindow ? 'static' : '';
       this.style.height = this.fullWindow ? 'auto' : '';
-      var parent = this.parentNode;
+      var parent = this.parentNode, s = '0';
       while (parent && parent != document.body) {
         if (parent.drawerWidth) {
           parent.fullWindow = this.fullWindow;
+          s = '';
           break;
         }
         parent = parent.parentNode;
       }
+      this.$.headerContainer.style.left = this.$.headerContainer.style.right = s;
     }   
 
   }, Polymer.CoreResizable));
