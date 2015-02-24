@@ -352,8 +352,6 @@ that represents a header by adding a `core-header` class to it.
       this.scrollObject && this.scrollObject.removeEventListener('scroll', this._scrollHandler);
       this.scrollObject = this.fullWindow ? window : this.$.mainContainer;
       this.scrollObject.addEventListener('scroll', this._scrollHandler);
-      this.style.position = this.fullWindow ? 'static' : '';
-      this.style.height = this.fullWindow ? 'auto' : '';
       var parent = this.parentNode, s = '0';
       while (parent && parent != document.body) {
         if (parent.drawerWidth) {
