@@ -9,8 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!--
 `core-scroll-header-panel` contains a header section and a content section.  The
-header is initially on the top part of the view but it scrolls away with the 
-rest of the scrollable content.  Upon scrolling slightly up at any point, the 
+header is initially on the top part of the view but it scrolls away with the
+rest of the scrollable content.  Upon scrolling slightly up at any point, the
 header scrolls back into view.  This saves screen space and allows users to
 access important controls by easily moving them back to the view.
 
@@ -36,7 +36,7 @@ or, if you would prefer to do it in CSS, just give `html`, `body`, and `core-scr
       height: 100%;
     }
 
-`core-scroll-header-panel` works well with `core-toolbar` but can use any element 
+`core-scroll-header-panel` works well with `core-toolbar` but can use any element
 that represents a header by adding a `core-header` class to it.
 
     <core-scroll-header-panel>
@@ -59,40 +59,40 @@ that represents a header by adding a `core-header` class to it.
   <link rel="stylesheet" href="core-scroll-header-panel.css">
 
   <div id="mainContainer">
-  
+
     <content id="mainContent" select=":not(core-toolbar):not(.core-header)"></content>
-    
+
   </div>
-  
+
   <div id="headerContainer">
-  
+
     <div class="bg-container">
       <div id="condensedHeaderBg"></div>
       <div id="headerBg"></div>
     </div>
-    
+
     <content id="headerContent" select="core-toolbar, .core-header"></content>
-    
+
   </div>
-  
+
 </template>
 <script>
 (function() {
 
   Polymer(Polymer.mixin({
-    
+
     /**
      * Fired when the content has been scrolled.
      *
      * @event scroll
      */
-     
+
     /**
      * Fired when the header is transformed.
      *
      * @event core-header-transform
      */
-     
+
     publish: {
       /**
        * If true, the header's height will condense to `_condensedHeaderHeight`
@@ -130,7 +130,7 @@ that represents a header by adding a `core-header` class to it.
        * @default false
        */
       fixed: false,
-      
+
       /**
        * If true, the condensed header is always shown and does not move away.
        *
@@ -164,7 +164,7 @@ that represents a header by adding a `core-header` class to it.
        * @default 0
        */
       condensedHeaderHeight: 0,
-      
+
       /**
        * By default, the top part of the header stays when the header is being
        * condensed.  Set this to true if you want the top part of the header
@@ -178,11 +178,11 @@ that represents a header by adding a `core-header` class to it.
     },
 
     prevScrollTop: 0,
-    
+
     headerMargin: 0,
-    
+
     y: 0,
-    
+
     observe: {
       'headerMargin fixed': 'setup'
     },
@@ -199,12 +199,12 @@ that represents a header by adding a `core-header` class to it.
       this._scrollHandler = this.scroll.bind(this);
       this.scroller.addEventListener('scroll', this._scrollHandler);
     },
-    
+
     detached: function() {
       this.scroller.removeEventListener('scroll', this._scrollHandler);
       this.resizableDetachedHandler();
     },
-    
+
     domReady: function() {
       this.async('measureHeaderHeight');
     },
@@ -212,7 +212,7 @@ that represents a header by adding a `core-header` class to it.
     get header() {
       return this.$.headerContent.getDistributedNodes()[0];
     },
-    
+
     /**
      * Returns the scrollable element.
      *
@@ -222,7 +222,7 @@ that represents a header by adding a `core-header` class to it.
     get scroller() {
       return this.$.mainContainer;
     },
-    
+
     /**
      * Invoke this to tell `core-scroll-header-panel` to re-measure the header's
      * height.
@@ -235,7 +235,7 @@ that represents a header by adding a `core-header` class to it.
         this.headerHeight = header.offsetHeight;
       }
     },
-    
+
     headerHeightChanged: function() {
       if (!this.condensedHeaderHeight) {
         // assume _condensedHeaderHeight is 1/3 of the headerHeight
@@ -243,7 +243,7 @@ that represents a header by adding a `core-header` class to it.
       }
       this.condensedHeaderHeightChanged();
     },
-    
+
     condensedHeaderHeightChanged: function() {
       if (this.condensedHeaderHeight) {
         this._condensedHeaderHeight = this.condensedHeaderHeight;
@@ -252,7 +252,7 @@ that represents a header by adding a `core-header` class to it.
         this.headerMargin = this.headerHeight - this._condensedHeaderHeight;
       }
     },
-    
+
     condensesChanged: function() {
       if (this.condenses) {
         this.scroll();
@@ -261,7 +261,7 @@ that represents a header by adding a `core-header` class to it.
         this.condenseHeader(null);
       }
     },
-    
+
     setup: function() {
       var s = this.scroller.style;
       s.paddingTop = this.fixed ? '' : this.headerHeight + 'px';
@@ -272,24 +272,24 @@ that represents a header by adding a `core-header` class to it.
         this.scroll();
       }
     },
-    
+
     transformHeader: function(y) {
       var s = this.$.headerContainer.style;
       this.translateY(s, -y);
-      
+
       if (this.condenses) {
         this.condenseHeader(y);
       }
-      
-      this.fire('core-header-transform', {y: y, height: this.headerHeight, 
+
+      this.fire('core-header-transform', {y: y, height: this.headerHeight,
           condensedHeight: this._condensedHeaderHeight});
     },
-    
+
     condenseHeader: function(y) {
       var reset = y == null;
       // adjust top bar in core-header so the top bar stays at the top
       if (!this.scrollAwayTopbar && this.header.$ && this.header.$.topBar) {
-        this.translateY(this.header.$.topBar.style, 
+        this.translateY(this.header.$.topBar.style,
             reset ? null : Math.min(y, this.headerMargin));
       }
       // transition header bg
@@ -308,50 +308,50 @@ that represents a header by adding a `core-header` class to it.
         this.translateY(chbg, reset ? null : y / 2);
       }
     },
-    
+
     translateY: function(s, y) {
       var t = y == null ? '' : 'translate3d(0, ' + y + 'px, 0)';
       setTransform(s, t);
     },
-    
+
     scroll: function(event) {
       if (!this.header) {
         return;
       }
-      
+
       var sTop = this.scroller.scrollTop;
-      
-      var y = Math.min(this.keepCondensedHeader ? 
-          this.headerMargin : this.headerHeight, Math.max(0, 
+
+      var y = Math.min(this.keepCondensedHeader ?
+          this.headerMargin : this.headerHeight, Math.max(0,
           (this.noReveal ? sTop : this.y + sTop - this.prevScrollTop)));
-      
+
       if (this.condenses && this.prevScrollTop >= sTop && sTop > this.headerMargin) {
         y = Math.max(y, this.headerMargin);
       }
-      
+
       if (!event || !this.fixed && y !== this.y) {
         this.transformHeader(y);
       }
-      
+
       this.prevScrollTop = Math.max(sTop, 0);
       this.y = y;
-      
+
       if (event) {
         this.fire('scroll', {target: this.scroller}, this, false);
       }
     }
 
   }, Polymer.CoreResizable));
-  
+
   //determine proper transform mechanizm
   if (document.documentElement.style.transform !== undefined) {
     var setTransform = function(style, string) {
       style.transform = string;
-    }
+    };
   } else {
     var setTransform = function(style, string) {
       style.webkitTransform = string;
-    }
+    };
   }
 
 })();
