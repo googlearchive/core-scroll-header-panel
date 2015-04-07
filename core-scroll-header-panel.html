@@ -54,6 +54,18 @@ that represents a header by adding a `core-header` class to it.
 <link rel="import" href="../core-resizable/core-resizable.html">
 
 <polymer-element name="core-scroll-header-panel">
+  <style>
+  [data-fullwindow] {
+    height: auto;
+  }
+  [data-fullwindow]::shadow #main {
+    position: relative;
+  }
+  [data-fullwindow]::shadow #drawer,
+  [data-fullwindow]::shadow #scrim {
+    position: fixed;
+  }
+  </style>
 <template>
 
   <link rel="stylesheet" href="core-scroll-header-panel.css">
@@ -94,6 +106,12 @@ that represents a header by adding a `core-header` class to it.
      */
      
     publish: {
+      
+      fullWindow: {
+        value: false,
+        reflect: true
+      },
+      
       /**
        * If true, the header's height will condense to `_condensedHeaderHeight`
        * as the user scrolls down from the top of the content area.
@@ -184,6 +202,7 @@ that represents a header by adding a `core-header` class to it.
     y: 0,
     
     observe: {
+      'fullWindow': 'fullWindowSetup',
       'headerMargin fixed': 'setup'
     },
 
@@ -192,16 +211,17 @@ that represents a header by adding a `core-header` class to it.
     },
 
     attached: function() {
+      this.fullWindowSetup();
       this.resizableAttachedHandler();
     },
 
     ready: function() {
       this._scrollHandler = this.scroll.bind(this);
-      this.scroller.addEventListener('scroll', this._scrollHandler);
     },
     
     detached: function() {
-      this.scroller.removeEventListener('scroll', this._scrollHandler);
+      this.drawerWidth = false;
+      this.scrollObject.removeEventListener('scroll', this._scrollHandler);
       this.resizableDetachedHandler();
     },
     
@@ -319,7 +339,7 @@ that represents a header by adding a `core-header` class to it.
         return;
       }
       
-      var sTop = this.scroller.scrollTop;
+      var sTop = this.fullWindow ? window.pageYOffset : this.$.mainContainer.scrollTop;
       
       var y = Math.min(this.keepCondensedHeader ? 
           this.headerMargin : this.headerHeight, Math.max(0, 
@@ -337,8 +357,51 @@ that represents a header by adding a `core-header` class to it.
       this.y = y;
       
       if (event) {
-        this.fire('scroll', {target: this.scroller}, this, false);
+        this.fire('scroll', {target: this.scrollObject}, this, false);
       }
+    },
+
+    fullWindowSetup: function() {
+      this.scrollObject && this.scrollObject.removeEventListener('scroll', this._scrollHandler);
+      this.scrollObject = this.fullWindow ? window : this.$.mainContainer;
+      this.scrollObject.addEventListener('scroll', this._scrollHandler);
+      if (this.fullWindow) {
+        this.style.position = 'static';
+        this.style.height = 'auto';
+        if (!this.drawerWidth) {
+          var parent = this.parentNode;
+          while (parent && parent != document.body) {
+            if (parent.drawerWidth) {
+              parent.setAttribute('data-fullwindow', true);
+              parent.addEventListener('core-responsive-change', this.toggleNarrow.bind(this));
+              this.drawerWidth = parent.drawerWidth;
+              this.rightDrawer = parent.rightDrawer;
+              this.narrow = parent.narrow;
+              break;
+            }
+            parent = parent.parentNode;
+          }
+        }
+      } else {
+        this.style.position = '';
+        this.style.height = '';
+        if (this.drawerWidth) {
+          var parent = this.parentNode;
+          while (parent && parent != document.body) {
+            if (parent.drawerWidth) {
+              parent.removeAttribute('data-fullwindow');
+              parent.removeEventListener('core-responsive-change', this.toggleNarrow.bind(this));
+              this.drawerWidth = false;
+              break;
+            }
+            parent = parent.parentNode;
+          }
+        }
+      }
+    },
+    
+    toggleNarrow: function(e) {
+      this.narrow = e.detail.narrow;
     }
 
   }, Polymer.CoreResizable));
