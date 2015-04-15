@@ -13,6 +13,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   overflow: hidden;
 }
 
+:host([fullWindow]) {
+  min-height: 100%;
+  height: auto;
+  position: relative;
+}
+
 #mainContainer {
   position: absolute;
   top: 0;
@@ -28,11 +34,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   transform: translateZ(0); /* github.com/Polymer/core-scroll-header-panel/pull/38 */
 }
 
+:host([fullWindow]) #mainContainer {
+  position: relative;
+}
+
 #headerContainer {
   position: absolute;
   top: 0;
   right: 0;
   left: 0;
+}
+
+:host([fullWindow]) #headerContainer {
+  position: fixed;
 }
 
 .bg-container {
