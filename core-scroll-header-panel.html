@@ -60,20 +60,20 @@ that represents a header by adding a `core-header` class to it.
 
   <div id="mainContainer">
   
+    <div id="headerContainer">
+      <div class="bg-container">
+        <div id="condensedHeaderBg"></div>
+        <div id="headerBg"></div>
+      </div>
+    
+      <content id="headerContent" select="core-toolbar, .core-header"></content>
+    </div>
+    
     <content id="mainContent" select=":not(core-toolbar):not(.core-header)"></content>
     
   </div>
   
-  <div id="headerContainer">
-  
-    <div class="bg-container">
-      <div id="condensedHeaderBg"></div>
-      <div id="headerBg"></div>
-    </div>
-    
-    <content id="headerContent" select="core-toolbar, .core-header"></content>
-    
-  </div>
+
   
 </template>
 <script>
