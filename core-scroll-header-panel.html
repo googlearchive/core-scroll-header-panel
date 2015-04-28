@@ -193,6 +193,9 @@ that represents a header by adding a `core-header` class to it.
 
     attached: function() {
       this.resizableAttachedHandler();
+      if (this.headerHeight === 0) {
+        this.measureHeaderHeight();
+      }
     },
 
     ready: function() {
@@ -203,10 +206,6 @@ that represents a header by adding a `core-header` class to it.
     detached: function() {
       this.scroller.removeEventListener('scroll', this._scrollHandler);
       this.resizableDetachedHandler();
-    },
-    
-    domReady: function() {
-      this.async('measureHeaderHeight');
     },
 
     get header() {
